@@ -15,7 +15,10 @@ def fetch_full_rss(source, content_fetcher)
   item = feed/:item
   item.each do |it|
     link = (it/:link).inner_html
-    (it/:description).inner_html = content_fetcher.call(link)
+    content = content_fetcher.call(link)
+    it.at(:description).after <<-CDATA
+    \n<content:encoded><!CDATA[#{content}]]</content/encoded>
+    CDATA
   end
   feed
 end
@@ -26,7 +29,7 @@ def fetch_sina_article(link)
   article = doc.search("//div[@id = 'articlebody']")
   paras = article/('.articalContent p')
   # use inner_text to conver html entities to character
-  content = paras.collect { |pa| pa.inner_html }.join("\n")
+  content = paras.collect { |pa| '<p>' + pa.inner_text + '</p>' }.join("\n")
 end
 
 # Han Han's blog on Sina, I created this to read his great articles
