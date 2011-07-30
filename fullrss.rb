@@ -23,7 +23,9 @@ def fetch_full_rss(source, content_fetcher)
     link = (it/:link).inner_html
     content = content_fetcher.call(link)
     it.at(:description).after <<-CDATA
-    \n<content:encoded><!CDATA[#{content}]]</content:encoded>
+    <content:encoded>
+    <![CDATA[#{content}]]>
+    </content:encoded>
     CDATA
   end
   feed
