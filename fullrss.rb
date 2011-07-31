@@ -14,9 +14,17 @@ def make_para(ppa)
   (pa == nil) or pa.empty? ? '' : "<p> #{ppa} </p>"
 end
 
+def add_xmlns_content(doc)
+  rss = doc.at(:rss)
+  unless rss.has_attribute? "xmlns:content"
+    rss.set_attribute "xmlns:content", "http://purl.org/rss/1.0/modules/content/"
+  end
+end
+
 # Convert expert RSS to full RSS
 def fetch_full_rss(source, content_fetcher)
   feed = open(source) { |f| Hpricot.XML(f) }
+  add_xmlns_content(feed)
 
   item = feed/:item
   item.each do |it|
@@ -37,12 +45,13 @@ def fetch_sina_article(link)
   article = doc.search("//div[@id = 'articlebody']")
   paras = article/('.articalContent p')
   # use inner_text to conver html entities to character
-  content = paras.collect { |pa| make_para(pa.inner_text) }.join
+  content = paras.collect { |pa| make_para(pa.inner_text) }.join("\n")
 end
 
 # Han Han's blog on Sina, I created this to read his great articles
 sources = [
   ["http://blog.sina.com.cn/rss/1191258123.xml", "hanhan.xml", method(:fetch_sina_article)],
+  #["./feed-hanhan.xml", "hanhan.xml", method(:fetch_sina_article)],
 ]
 
 #print fetch_sina_article('./article.html')
