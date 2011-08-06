@@ -58,8 +58,7 @@ end
 sources = [
   # Han Han's blog on Sina, I created this to read his great articles
   ["http://blog.sina.com.cn/rss/1191258123.xml", "hanhan.xml", method(:fetch_sina_article)],
-  ["http://solidot.org/index.rss", "solidot.xml", method(:convert_solidot_article)],
-  #["./feed-solidot.xml", "solidot.xml", method(:convert_solidot_article)],
+  ["http://solidot.org.feedsportal.com/c/33236/f/556826/index.rss", "solidot.xml", method(:convert_solidot_article)],
 ]
 
 #print fetch_sina_article('./article.html')
