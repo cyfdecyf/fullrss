@@ -21,43 +21,41 @@ def add_xmlns_content(doc)
   end
 end
 
-# Convert expert RSS to full RSS
-def fetch_full_rss(source, content_fetcher)
+def convert_rss(source, content_fetcher)
   feed = open(source) { |f| Hpricot.XML(f) }
   add_xmlns_content(feed)
 
   item = feed/:item
   item.each do |it|
-    link = (it/:link).inner_html
-    content = content_fetcher.call(link)
-    it.at(:description).after <<-CDATA
-    \n<content:encoded><![CDATA[#{content}]]></content:encoded>
-    CDATA
+    content_fetcher.call(it)
   end
   feed
 end
 
-def fetch_sina_article(link)
-  # TODO fetch page and building the final text should be same for web pages,
-  # extract the selector process out if adding more excerpt rss feed
+def fetch_sina_article(item)
+  link = item.at(:link).inner_html
   doc = open(link) { |f| Hpricot(f) }
 
   article = doc.search("//div[@id = 'articlebody']")
   paras = article/('.articalContent p')
   # use inner_text to conver html entities to character
   content = paras.collect { |pa| make_para(pa.inner_text) }.join("\n")
+  item.at(:description).after <<-CDATA
+  \n<content:encoded><![CDATA[#{content}]]></content:encoded>
+  CDATA
 end
 
-# Han Han's blog on Sina, I created this to read his great articles
 sources = [
+  # Han Han's blog on Sina, I created this to read his great articles
   ["http://blog.sina.com.cn/rss/1191258123.xml", "hanhan.xml", method(:fetch_sina_article)],
+  #["http://solidot.org/index.rss", "solidot.xml", method(:fetch_solidot_article)],
   #["./feed-hanhan.xml", "hanhan.xml", method(:fetch_sina_article)],
 ]
 
 #print fetch_sina_article('./article.html')
 
 sources.each do |url, file, fetcher|
-  full = fetch_full_rss(url, fetcher)
+  full = convert_rss(url, fetcher)
   File.open(file, "w") { |f| f.write(full) }
 end
 
