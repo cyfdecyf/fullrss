@@ -82,8 +82,11 @@ module FullRSS
     end
 
     def cgi_output
+      # Get the feed first and then send it with the content together to avoid
+      # GReader complaining feed not found
+      feed = convert_rss
       print CGI_HEADER
-      print convert_rss
+      print feed
     end
 
     def add_xmlns_content(doc)
