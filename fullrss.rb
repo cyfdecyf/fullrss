@@ -50,7 +50,7 @@ module FullRSS
         @fetcher.call(it, content)
       else
         content = @fetcher.call(it)
-        insert_cache_content(it, content)
+        insert_content(it, content)
       end
     end
 
