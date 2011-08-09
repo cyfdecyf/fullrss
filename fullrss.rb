@@ -1,15 +1,16 @@
-#!/usr/bin/env ruby
 #encoding: UTF-8
 
 # Only tested with UTF-8 encoding XML and HTML
 # If there's problems with other encoding, convert to UTF-8 first
 
 require 'rubygems'
+Gem.path.unshift "/home1/bugeiqia/.gem/ruby/1.8"
+
 require 'hpricot'
 require 'open-uri'
 
 module FullRSS
-  CGI_HEADER = "Content-type: text/xml\r\n\r\n"""
+  CGI_HEADER = "Content-Type: application/rss+xml\r\n\r\n"
 
   def self.make_para(ppa)
     # &nbsp; is converted to special white space by hpricot, need special care
