@@ -6,11 +6,13 @@
 require 'rubygems'
 Gem.path.unshift "/home1/bugeiqia/.gem/ruby/1.8"
 
+require 'fileutils'
 require 'hpricot'
 require 'open-uri'
 
 module FullRSS
   CGI_HEADER = "Content-Type: application/rss+xml\r\n\r\n"
+  CACHE_DIR = File.join(File.expand_path(File.dirname(__FILE__)), 'content')
 
   def self.make_para(ppa)
     # &nbsp; is converted to special white space by hpricot, need special care
@@ -45,20 +47,38 @@ module FullRSS
     end
 
     def upsert_content(it)
-      content = find_content(it)
+      content = get_content(it)
       if content
         @fetcher.call(it, content)
       else
         content = @fetcher.call(it)
-        insert_content(it, content)
+        store_content(it, content)
       end
     end
 
-    def find_content(it)
-      return nil
+    def item2path(item)
+      link = item.at(:link).inner_html
+      File.join(CACHE_DIR, link.sub('http://', ''))
     end
 
-    def insert_content(it, content)
+    def get_content(it)
+      path = item2path it
+
+      if File.exists? path
+        IO.read path
+      else
+        return nil
+      end
+    end
+
+    def store_content(it, content)
+      path = item2path it
+      dir = File.dirname(path)
+
+      FileUtils.mkdir_p dir
+      File.open(path, "w") do |f|
+        f.write content
+      end
     end
 
     def cgi_output
