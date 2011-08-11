@@ -2,7 +2,9 @@
 
 require 'fullrss'
 
-def fetch_sina_article(item, content = nil)
+source = "http://blog.sina.com.cn/rss/1191258123.xml"
+
+FullRSS.convert_to_cgi_output(source, true) do |item, content|
   if content == nil
     link = item.at(:link).inner_html
     doc = open(link) { |f| Hpricot(f) }
@@ -15,7 +17,3 @@ def fetch_sina_article(item, content = nil)
   item.at(:description).inner_html = FullRSS.create_cdata(content)
   content
 end
-
-source = "http://blog.sina.com.cn/rss/1191258123.xml"
-
-FullRSS::RSS.new(source, method(:fetch_sina_article), true).cgi_output

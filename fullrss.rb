@@ -28,34 +28,48 @@ module FullRSS
     "\n<content:encoded>#{create_cdata(content)}</content:encoded>"
   end
 
+  def self.convert_to_cgi_output(source, cache = false, &converter)
+    rss = FullRSS::RSS.new(source, cache)
+    rss.each_item! &converter
+    rss.cgi_output
+  end
+
   class RSS
-    def initialize(source, fetcher, cache = false)
+    def initialize(source, cache = false)
       @source = source
-      @fetcher = fetcher
       @cache = cache
     end
 
-    def convert_rss
-      feed = open(@source) { |f| Hpricot.XML(f) }
-      add_xmlns_content(feed)
+    # To use cache, the converter should return the content it wants to be cached
+    def each_item!(&converter)
+      @converter = converter
+      @feed = open(@source) { |f| Hpricot.XML(f) }
+      add_xmlns_content(@feed)
 
-      item = feed/:item
+      item = @feed/:item
       item.each do |it|
         if @cache == false
-          @fetcher.call(it)
+          @converter.call(it)
         else
           upsert_content(it)
         end
       end
-      feed
+      self
     end
+
+    def cgi_output
+      print CGI_HEADER
+      print @feed
+    end
+
+    private
 
     def upsert_content(it)
       content = get_content(it)
       if content
-        @fetcher.call(it, content)
+        @converter.call(it, content)
       else
-        content = @fetcher.call(it)
+        content = @converter.call(it)
         store_content(it, content)
       end
     end
@@ -83,14 +97,6 @@ module FullRSS
       File.open(path, "w") do |f|
         f.write content
       end
-    end
-
-    def cgi_output
-      # Get the feed first and then send it with the content together to avoid
-      # GReader complaining feed not found
-      feed = convert_rss
-      print CGI_HEADER
-      print feed
     end
 
     def add_xmlns_content(doc)
