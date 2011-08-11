@@ -14,14 +14,18 @@ module FullRSS
   CGI_HEADER = "Content-Type: application/rss+xml\r\n\r\n"
   CACHE_DIR = File.join(File.expand_path(File.dirname(__FILE__)), 'content')
 
-  def self.make_para(ppa)
+  def self.create_para(ppa)
     # &nbsp; is converted to special white space by hpricot, need special care
     pa = ppa.gsub("\302\240", ' ').strip
     (pa == nil) or pa.empty? ? '' : "<p> #{ppa} </p>"
   end
 
+  def self.create_cdata(content)
+    "<![CDATA[#{content}]]>"
+  end
+
   def self.create_content(content)
-    return "\n<content:encoded><![CDATA[#{content}]]></content:encoded>"
+    "\n<content:encoded>#{create_cdata(content)}</content:encoded>"
   end
 
   class RSS

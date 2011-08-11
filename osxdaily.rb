@@ -14,7 +14,6 @@ def convert_macrumors_article(item)
 end
 
 source = "http://feeds.feedburner.com/osxdaily"
-source = "./osxdaily"
 
 FullRSS::RSS.new(source, method(:convert_macrumors_article)).cgi_output
 

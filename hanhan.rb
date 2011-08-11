@@ -10,7 +10,7 @@ def fetch_sina_article(item, content = nil)
     article = doc.search("//div[@id = 'articlebody']")
     paras = article/('.articalContent p')
     # use inner_text to conver html entities to character
-    content = paras.collect { |pa| FullRSS.make_para(pa.inner_text) }.join("\n")
+    content = paras.collect { |pa| FullRSS.create_para(pa.inner_text) }.join("\n")
   end
   item.at(:description).after FullRSS.create_content(content)
   content
