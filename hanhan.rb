@@ -12,7 +12,7 @@ def fetch_sina_article(item, content = nil)
     # use inner_text to conver html entities to character
     content = paras.collect { |pa| FullRSS.create_para(pa.inner_text) }.join("\n")
   end
-  item.at(:description).after FullRSS.create_content(content)
+  item.at(:description).inner_html = FullRSS.create_cdata(content)
   content
 end
 
