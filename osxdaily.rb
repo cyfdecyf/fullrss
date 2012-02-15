@@ -2,7 +2,9 @@
 
 require 'fullrss'
 
-def convert_macrumors_article(item)
+source = "http://feeds.feedburner.com/osxdaily"
+
+FullRSS.convert_to_cgi_output(source) do |item|
   content = item.at("content:encoded")
   html = content.inner_html
   buf = ''
@@ -12,8 +14,3 @@ def convert_macrumors_article(item)
   end
   content.inner_html = buf + ']]>'
 end
-
-source = "http://feeds.feedburner.com/osxdaily"
-
-FullRSS::RSS.new(source, method(:convert_macrumors_article)).cgi_output
-
