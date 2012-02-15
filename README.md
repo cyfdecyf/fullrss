@@ -1,3 +1,13 @@
+Recommend fivefilters now
+=========================
+
+[fivefilvers](http://fivefilters.org/content-only/) provides the service to
+convert partial RSS to full content RSS. They use Readability's content api to
+get the full content. So it should be reliable than doing it manually.
+
+This project will still be useful for some simple tasks. Like removing the
+footnote at the end of each item, etc.
+
 Why
 ===
 
